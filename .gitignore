@@ -1,0 +1,34 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+
+# Build output
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+
+# Coverage and debug
+coverage/
+*.tgz
+
+# Optional: ignore SQLite DB or temp files
+*.sqlite
+*.db
+*.tmp
