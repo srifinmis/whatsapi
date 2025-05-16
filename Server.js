@@ -1,14 +1,15 @@
 require("dotenv").config();
 const express = require("express");
 const getCustomerOutstanding = require("./Queries/getCustomerOutstanding");
-const bodyParser = require("body-parser");
-const { handleUpiPayment } = require("./Queries/upiController");
-
+const bodyParser = require('body-parser');
+const { handleUpiPayment } = require('./upiController');
 const app = express();
-const port = 3000;
+const port = 3003;
+
 app.use(bodyParser.json());
 
-app.post("/api/upi-payment", handleUpiPayment);
+// POST API for receiving UPI payment response
+app.post('/api/upi-payment', handleUpiPayment);
 
 app.get("/api/customer-outstanding", async (req, res) => {
   const { customer_id, as_on_date } = req.query;
@@ -16,6 +17,7 @@ app.get("/api/customer-outstanding", async (req, res) => {
   if (!customer_id) {
     return res.status(400).json({ error: "Missing customer_id" });
   }
+
   try {
     const result = await getCustomerOutstanding(customer_id, as_on_date);
 
@@ -24,9 +26,9 @@ app.get("/api/customer-outstanding", async (req, res) => {
     }
 
     res.json({
-      customer_id: result.customer_id.toString(),
-      EWI: parseFloat(result.emi_amt),
-      Total_overdue: parseFloat(result.total_overdue),
+      customer_id: result.customer_id,
+      EWI:result.emi_amt,
+      total_outstanding: parseFloat(result.total_overdue)
     });
   } catch (err) {
     console.error("Error fetching data from Athena:", err);
