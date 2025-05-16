@@ -8,10 +8,23 @@ const port = 3003;
 
 app.use(bodyParser.json());
 
-// POST API for receiving UPI payment response
-app.post('/api/upi-payment', handleUpiPayment);
+// Token authentication middleware
+function authenticateToken(req, res, next) {
+  const token = req.headers['x-api-token'];
+  const VALID_TOKEN = process.env.API_TOKEN;
 
-app.get("/api/customer-outstanding", async (req, res) => {
+  if (!token || token !== VALID_TOKEN) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid or missing token' });
+  }
+
+  next();
+}
+
+// Protected route: UPI payment response
+app.post('/api/upi-payment', authenticateToken, handleUpiPayment);
+
+// Protected route: Get customer outstanding
+app.get("/api/customer-outstanding", authenticateToken, async (req, res) => {
   const { customer_id, as_on_date } = req.query;
 
   if (!customer_id) {
@@ -27,7 +40,7 @@ app.get("/api/customer-outstanding", async (req, res) => {
 
     res.json({
       customer_id: result.customer_id,
-      EWI:result.emi_amt,
+      EWI: result.emi_amt,
       total_outstanding: parseFloat(result.total_overdue)
     });
   } catch (err) {
